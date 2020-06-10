@@ -10,18 +10,13 @@ typedef boost::random::variate_generator<gen_type&, beta_dist_type> beta_gen_typ
 typedef boost::random::variate_generator<gen_type&, uniform_dist_type> uniform_gen_type;
 
 // values for median = 0.33 for beta dist
-//const float alpha = 1.71347194248032f;
-//const float beta = 5.f;
-
-//const float alpha = 1.5f;
-//const float beta = 4.29304676159030f;
-
 const float alpha = 0.797341459119764;
 const float beta = 2;
 
 const int max = 100;
 const int min = 10;
 int rotation_counter = 0;
+int time_to_run = 0;
 // Hz
 double angular_speed;
 gen_type random_generator(time(NULL));
@@ -40,18 +35,53 @@ double get_random_uniform()
     return random_uniform_generator();
 }
 
-int main()
+void print_help()
 {
-    angular_speed = get_random_uniform() * 360;
+    std::cout << "Usage: -t [seconds to run]" << std::endl;
+}
 
-    sf::RenderWindow window(sf::VideoMode(300, 300), "");
+bool parse(int argc, char* argv[])
+{
+    if (argc == 1)
+    {
+        print_help();
+        return false;
+    }
+
+    for (int i = 1; i < argc; i++)
+    {
+        if (std::string(argv[i]) == "-t")
+        {
+            time_to_run = std::atoi(argv[++i]);
+        }
+        if (std::string(argv[i]) == "-h")
+        {
+            print_help();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+int main(int argc, char* argv[])
+{
+    if (!parse(argc, argv))
+    {
+        return 1;
+    }
+
+    angular_speed = get_random_uniform() * 360;
+    sf::RenderWindow window(sf::VideoMode(300, 300), "Rectangle");
     sf::RectangleShape shape(sf::Vector2f(50, 100));
     shape.setFillColor(sf::Color::Green);
     shape.setOrigin(25, 50);
     shape.setPosition(150, 150);
-    sf::Clock clock;
+    sf::Clock frame_clock;
+    sf::Clock program_clock;
 
-    while (window.isOpen())
+    while (program_clock.getElapsedTime().asSeconds() < time_to_run)
     {
         float delay = get_random_beta();
         sf::Event event;
@@ -61,14 +91,11 @@ int main()
                 window.close();
         }
         window.clear();
-
-        while (clock.getElapsedTime().asSeconds() < delay/1000)
+        while (frame_clock.getElapsedTime().asSeconds() < delay/1000)
         {
         }
-
-        float deg = clock.getElapsedTime().asSeconds() * angular_speed;
+        float deg = frame_clock.getElapsedTime().asSeconds() * angular_speed;
         //std::cout << "delay: " << delay << " rotate: "<< deg << " speed: "<< deg/delay << " ang_speed: " << angular_speed << " ratio: " << (deg/delay)/angular_speed << std::endl;
-
         if (shape.getRotation() + deg >= 360)
         {
             rotation_counter++;
@@ -76,10 +103,10 @@ int main()
         shape.rotate(deg);
         window.draw(shape);
         window.display();
-
-        clock.restart();
+        frame_clock.restart();
     }
 
+    window.close();
     std::cout << "Rotations: " << rotation_counter << std::endl;
     return 0;
 }
