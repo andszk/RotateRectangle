@@ -21,6 +21,7 @@ const float beta = 2;
 
 const int max = 100;
 const int min = 10;
+int rotation_counter = 0;
 // Hz
 double angular_speed;
 gen_type random_generator(time(NULL));
@@ -67,6 +68,11 @@ int main()
 
         float deg = clock.getElapsedTime().asSeconds() * angular_speed;
         //std::cout << "delay: " << delay << " rotate: "<< deg << " speed: "<< deg/delay << " ang_speed: " << angular_speed << " ratio: " << (deg/delay)/angular_speed << std::endl;
+
+        if (shape.getRotation() + deg >= 360)
+        {
+            rotation_counter++;
+        }
         shape.rotate(deg);
         window.draw(shape);
         window.display();
@@ -74,5 +80,6 @@ int main()
         clock.restart();
     }
 
+    std::cout << "Rotations: " << rotation_counter << std::endl;
     return 0;
 }
