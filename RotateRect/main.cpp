@@ -20,7 +20,7 @@ int time_to_run = 0;
 // Hz
 double angular_speed;
 gen_type random_generator(time(NULL));
-uniform_dist_type uniform_dist(0.2, 2);
+uniform_dist_type uniform_dist(5, 20);
 uniform_gen_type random_uniform_generator(random_generator, uniform_dist);
 beta_dist_type beta_dist(alpha, beta);
 beta_gen_type random_beta_generator(random_generator, beta_dist);
@@ -72,12 +72,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    angular_speed = get_random_uniform() * 360;
-    sf::RenderWindow window(sf::VideoMode(300, 300), "Rectangle");
+    angular_speed = get_random_uniform();
+    sf::RenderWindow window(sf::VideoMode(200, 200), "Rectangle");
     sf::RectangleShape shape(sf::Vector2f(50, 100));
     shape.setFillColor(sf::Color::Green);
     shape.setOrigin(25, 50);
-    shape.setPosition(150, 150);
+    shape.setPosition(100, 100);
     sf::Clock frame_clock;
     sf::Clock program_clock;
 
@@ -94,13 +94,12 @@ int main(int argc, char* argv[])
         while (frame_clock.getElapsedTime().asSeconds() < delay/1000)
         {
         }
-        float deg = frame_clock.getElapsedTime().asSeconds() * angular_speed;
-        //std::cout << "delay: " << delay << " rotate: "<< deg << " speed: "<< deg/delay << " ang_speed: " << angular_speed << " ratio: " << (deg/delay)/angular_speed << std::endl;
-        if (shape.getRotation() + deg >= 360)
+        std::cout << "dt: " << delay << " r: "<< shape.getRotation() << std::endl;
+        if (shape.getRotation() + angular_speed >= 360)
         {
             rotation_counter++;
         }
-        shape.rotate(deg);
+        shape.rotate(angular_speed);
         window.draw(shape);
         window.display();
         frame_clock.restart();
