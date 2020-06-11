@@ -64,6 +64,18 @@ bool parse(int argc, char* argv[])
     return true;
 }
 
+void  crash()
+{
+    uniform_dist_type uniform_dist_crash(1, 100);
+    uniform_gen_type crash_gen(random_generator, uniform_dist_crash);
+    int val = crash_gen();
+    if (val <= 20)
+    {
+        std::cout << "It's a feature!" << std::endl;
+        *((int*)0xABCD000000000000) = 5;
+    }
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -71,7 +83,8 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
-
+    
+    crash();
     angular_speed = get_random_uniform();
     sf::RenderWindow window(sf::VideoMode(200, 200), "Rectangle");
     sf::RectangleShape shape(sf::Vector2f(50, 100));
