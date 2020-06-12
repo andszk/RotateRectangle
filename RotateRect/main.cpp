@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <boost/random.hpp>
 #include <boost/random/beta_distribution.hpp>
+#include <thread>         
+#include <chrono>
+using namespace std::chrono;
 
 typedef boost::random::mt19937 gen_type;
 typedef boost::random::beta_distribution<> beta_dist_type;
@@ -19,7 +22,9 @@ int rotation_counter = 0;
 int time_to_run = 0;
 // Hz
 double angular_speed;
-gen_type random_generator(time(NULL));
+
+milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+gen_type random_generator(ms.count());
 uniform_dist_type uniform_dist(5, 20);
 uniform_gen_type random_uniform_generator(random_generator, uniform_dist);
 beta_dist_type beta_dist(alpha, beta);
@@ -106,6 +111,7 @@ int main(int argc, char* argv[])
         window.clear();
         while (frame_clock.getElapsedTime().asSeconds() < delay/1000)
         {
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
         std::cout << "dt: " << delay << " r: "<< shape.getRotation() << std::endl;
         if (shape.getRotation() + angular_speed >= 360)
